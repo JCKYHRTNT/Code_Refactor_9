@@ -183,23 +183,20 @@ public class Game {
 	}
 
 	public void playerCheck() {
-		int total = playerHand.getTotalValue();
-		if (total == 21) {
-			System.out.println("BLACK JACK!!!! Player Wins");
-			running = false;
-		} else if (total > 21) {
-			System.out.println("Player Busted");
-			running = false;
-		}
+		checkBlackjackOrBust(playerHand, "Player");
 	}
 
 	public void dealerCheck() {
-		int total = dealerHand.getTotalValue();
+		checkBlackjackOrBust(dealerHand, "Dealer");
+	}
+
+	public void checkBlackjackOrBust(Hand hand, String owner) {
+		int total = hand.getTotalValue();
 		if (total == 21) {
-			System.out.println("BLACK JACK!!!! Dealer Wins");
+			System.out.println("BLACK JACK!!!! " + owner + " Wins");
 			running = false;
 		} else if (total > 21) {
-			System.out.println("Dealer Busted");
+			System.out.println(owner + " Busted");
 			running = false;
 		}
 	}
