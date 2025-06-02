@@ -27,15 +27,17 @@ public class Main {
 	}
 
 	public static void playerTurn() {
-		Card card1 = Deck.draw();
-		Card card2 = Deck.draw();
+		Card card1 = deck.draw();
+		Card card2 = deck.draw();
 		initialPlayerDraw(card1, card2);
 		String choice = " ";
 		int turn = 0;
 
 		while (running) {
 			choice = getPlayerChoice(turn, card1, card2);
-			if (!handlePlayerChoice(choice, turn, card1, card2)) break;
+			Boolean result = handlePlayerChoice(choice, turn, card1, card2);
+			if (result == null) continue;
+			if (!result) break;
 			turn++;
 		}
 	}
@@ -61,7 +63,7 @@ public class Main {
 		return input.nextLine();
 	}
 
-	public static boolean handlePlayerChoice(String choice, int turn, Card card1, Card card2) {
+	public static Boolean handlePlayerChoice(String choice, int turn, Card card1, Card card2) {
 		if (choice.equalsIgnoreCase("hit")) {
 			System.out.println("you hit");
 			hit();
@@ -81,7 +83,7 @@ public class Main {
 			return false;
 		} else {
 			System.out.println("Sorry that wasnt an option please try again");
-			return true;
+			return null;
 		}
 	}
 
