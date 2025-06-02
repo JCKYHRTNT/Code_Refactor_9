@@ -29,51 +29,59 @@ public class Main {
 	public static void playerTurn() {
 		Card card1 = Deck.draw();
 		Card card2 = Deck.draw();
-
-		playerHand.addCard(card1);
-		playerHand.addCard(card2);
-
-		System.out.println("Player Card 1: " + card1.face);
-		System.out.println("Player Card 2: " + card2.face);
-		System.out.println("Player Total: " + playerHand.getTotalValue());
-
-		playerCheck();
-		System.out.println();
+		initialPlayerDraw(card1, card2);
 		String choice = " ";
 		int turn = 0;
 
-		for (; running == true;) {
-			if (turn >= 1) {
-				System.out.println("Would you like to hit or stand?");
-				choice = input.nextLine();
-			} else if (card1.face.equals(card2.face) && turn < 1) {
-				System.out.println("What would you like to do: Hit, Stand, Double Down, or Split?");
-				choice = input.nextLine();
-			} else if (turn == 0) {
-				System.out.println("What would you like to do: Hit, Stand, Double Down: ");
-				choice = input.nextLine();
-			}
+		while (running) {
+			choice = getPlayerChoice(turn, card1, card2);
+			if (!handlePlayerChoice(choice, turn, card1, card2)) break;
+			turn++;
+		}
+	}
 
-			if (choice.equalsIgnoreCase("hit")) {
-				System.out.println("you hit");
-				turn++;
-				hit();
-				playerCheck();
-			} else if (choice.equalsIgnoreCase("stand")) {
-				System.out.println("you stood");
-				break;
-			} else if (choice.equalsIgnoreCase("double down")) {
-				System.out.println("you doubled down");
-				hit();
-				playerCheck();
-				break;
-			} else if (choice.equalsIgnoreCase("split")) {
-				System.out.println("you split");
-				split(card1, card2);
-				break;
-			} else {
-				System.out.println("Sorry that wasnt an option please try again");
-			}
+	public static void initialPlayerDraw(Card card1, Card card2) {
+		playerHand.addCard(card1);
+		playerHand.addCard(card2);
+		System.out.println("Player Card 1: " + card1.face);
+		System.out.println("Player Card 2: " + card2.face);
+		System.out.println("Player Total: " + playerHand.getTotalValue());
+		playerCheck();
+		System.out.println();
+	}
+
+	public static String getPlayerChoice(int turn, Card card1, Card card2) {
+		if (turn >= 1) {
+			System.out.println("Would you like to hit or stand?");
+		} else if (card1.face.equals(card2.face)) {
+			System.out.println("What would you like to do: Hit, Stand, Double Down, or Split?");
+		} else {
+			System.out.println("What would you like to do: Hit, Stand, Double Down: ");
+		}
+		return input.nextLine();
+	}
+
+	public static boolean handlePlayerChoice(String choice, int turn, Card card1, Card card2) {
+		if (choice.equalsIgnoreCase("hit")) {
+			System.out.println("you hit");
+			hit();
+			playerCheck();
+			return true;
+		} else if (choice.equalsIgnoreCase("stand")) {
+			System.out.println("you stood");
+			return false;
+		} else if (choice.equalsIgnoreCase("double down")) {
+			System.out.println("you doubled down");
+			hit();
+			playerCheck();
+			return false;
+		} else if (choice.equalsIgnoreCase("split")) {
+			System.out.println("you split");
+			split(card1, card2);
+			return false;
+		} else {
+			System.out.println("Sorry that wasnt an option please try again");
+			return true;
 		}
 	}
 
@@ -134,67 +142,39 @@ public class Main {
 		System.out.println("Total: " + hand2.getTotalValue());
 
 		System.out.println();
+		playSplitHand(hand1, 1);
+		playSplitHand(hand2, 2);
+	}
+
+	public static void playSplitHand(Hand hand, int handNumber) {
 		String choice = "";
 		int turn = 0;
 
-		for (boolean isLoop = true; isLoop == true;) {
+		while (true) {
 			if (turn == 0) {
-				System.out.println("What would you like to do for hand 1? Hit, Stand, Double Down");
-				choice = input.nextLine();
+				System.out.println("What would you like to do for hand " + handNumber + "? Hit, Stand, Double Down");
 			} else {
 				System.out.println("What would you like to do? hit or stand?");
-				choice = input.nextLine();
 			}
+			choice = input.nextLine();
 
 			if (choice.equalsIgnoreCase("stand")) {
 				System.out.println("You stood");
-				isLoop = false;
+				break;
 			} else if (choice.equalsIgnoreCase("hit")) {
 				turn++;
 				System.out.println("you hit");
 				Card newCard = Deck.draw();
-				hand1.addCard(newCard);
+				hand.addCard(newCard);
 				System.out.println("Card " + (turn + 2) + ": " + newCard.face);
-				System.out.println("Total: " + hand1.getTotalValue());
+				System.out.println("Total: " + hand.getTotalValue());
 			} else if (choice.equalsIgnoreCase("double down")) {
 				System.out.println("you doubled down");
 				Card newCard = Deck.draw();
-				hand1.addCard(newCard);
+				hand.addCard(newCard);
 				System.out.println("Card 3: " + newCard.face);
-				System.out.println("Total: " + hand1.getTotalValue());
-				isLoop = false;
-			} else {
-				System.out.println("Thats not an option please try again.");
-			}
-		}
-
-		turn = 0;
-		for (boolean isLoop2 = true; isLoop2 == true;) {
-			if (turn == 0) {
-				System.out.println("What would you like to do for hand 2? Hit, Stand, Double Down");
-				choice = input.nextLine();
-			} else {
-				System.out.println("What would you like to do? hit or stand?");
-				choice = input.nextLine();
-			}
-
-			if (choice.equalsIgnoreCase("stand")) {
-				System.out.println("You stood");
-				isLoop2 = false;
-			} else if (choice.equalsIgnoreCase("hit")) {
-				turn++;
-				System.out.println("you hit");
-				Card newCard = Deck.draw();
-				hand2.addCard(newCard);
-				System.out.println("Card " + (turn + 2) + ": " + newCard.face);
-				System.out.println("Total: " + hand2.getTotalValue());
-			} else if (choice.equalsIgnoreCase("double down")) {
-				System.out.println("you doubled down");
-				Card newCard = Deck.draw();
-				hand2.addCard(newCard);
-				System.out.println("Card 3: " + newCard.face);
-				System.out.println("Total: " + hand2.getTotalValue());
-				isLoop2 = false;
+				System.out.println("Total: " + hand.getTotalValue());
+				break;
 			} else {
 				System.out.println("Thats not an option please try again.");
 			}
