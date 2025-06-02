@@ -34,13 +34,8 @@ public class Main {
     }
 
     public static void playerTurn() {
-        playerCard1 = deck.drawCard();
-        playerCard2 = deck.drawCard();
-        playerCardVal = playerCard1.getValue() + playerCard2.getValue();
-
-        System.out.println("Player Card 1: " + playerCard1);
-        System.out.println("Player Card 2: " + playerCard2);
-        System.out.println("Player Total: " + playerCardVal);
+        drawInitialPlayerCards();
+        displayPlayerCards();
         playerCheck();
         System.out.println();
 
@@ -48,42 +43,64 @@ public class Main {
         int turn = 0;
 
         while (running) {
-            if (turn >= 1) {
-                System.out.println("Would you like to hit or stand?");
-            } else if (playerCard1.getRank().equals(playerCard2.getRank())) {
-                System.out.println("What would you like to do: Hit, Stand, Double Down, or Split?");
-            } else {
-                System.out.println("What would you like to do: Hit, Stand, Double Down:");
-            }
-
+            displayPlayerOptions(turn);
             choice = input.nextLine().toLowerCase();
-
-            switch (choice) {
-                case "hit":
-                    System.out.println("you hit");
-                    turn++;
-                    hit();
-                    playerCheck();
-                    break;
-                case "stand":
-                    System.out.println("you stood");
-                    return;
-                case "double down":
-                    System.out.println("you doubled down");
-                    hit();
-                    playerCheck();
-                    return;
-                case "split":
-                    if (playerCard1.getRank().equals(playerCard2.getRank())) {
-                        System.out.println("you split");
-                        split();
-                    } else {
-                        System.out.println("Split not allowed. Cards are not identical.");
-                    }
-                    return;
-                default:
-                    System.out.println("Sorry that wasnt an option please try again");
+            if (processPlayerChoice(choice)) {
+                turn++;
+            } else {
+                break;
             }
+        }
+    }
+
+    private static void drawInitialPlayerCards() {
+        playerCard1 = deck.drawCard();
+        playerCard2 = deck.drawCard();
+        playerCardVal = playerCard1.getValue() + playerCard2.getValue();
+    }
+
+    private static void displayPlayerCards() {
+        System.out.println("Player Card 1: " + playerCard1);
+        System.out.println("Player Card 2: " + playerCard2);
+        System.out.println("Player Total: " + playerCardVal);
+    }
+
+    private static void displayPlayerOptions(int turn) {
+        if (turn >= 1) {
+            System.out.println("Would you like to hit or stand?");
+        } else if (playerCard1.getRank().equals(playerCard2.getRank())) {
+            System.out.println("What would you like to do: Hit, Stand, Double Down, or Split?");
+        } else {
+            System.out.println("What would you like to do: Hit, Stand, Double Down:");
+        }
+    }
+
+    private static boolean processPlayerChoice(String choice) {
+        switch (choice) {
+            case "hit":
+                System.out.println("you hit");
+                hit();
+                playerCheck();
+                return true;
+            case "stand":
+                System.out.println("you stood");
+                return false;
+            case "double down":
+                System.out.println("you doubled down");
+                hit();
+                playerCheck();
+                return false;
+            case "split":
+                if (playerCard1.getRank().equals(playerCard2.getRank())) {
+                    System.out.println("you split");
+                    split();
+                } else {
+                    System.out.println("Split not allowed. Cards are not identical.");
+                }
+                return false;
+            default:
+                System.out.println("Sorry that wasnt an option please try again");
+                return true;
         }
     }
 
@@ -145,36 +162,45 @@ public class Main {
         int turn = 0;
 
         while (true) {
-            if (turn == 0) {
-                System.out.println("What would you like to do? Hit, Stand, Double Down");
-            } else {
-                System.out.println("What would you like to do? hit or stand?");
-            }
-
+            promptSplitOptions(turn);
             choice = input.nextLine().toLowerCase();
 
-            switch (choice) {
-                case "stand":
-                    System.out.println("You stood");
-                    return;
-                case "hit":
-                    turn++;
-                    System.out.println("you hit");
-                    Card card = deck.drawCard();
-                    hand.addCard(card);
-                    System.out.println("Card " + (turn + 2) + ": " + card);
-                    System.out.println("Total: " + hand.getTotalValue());
-                    break;
-                case "double down":
-                    System.out.println("you doubled down");
-                    Card card2 = deck.drawCard();
-                    hand.addCard(card2);
-                    System.out.println("Card 3: " + card2);
-                    System.out.println("Total: " + hand.getTotalValue());
-                    return;
-                default:
-                    System.out.println("Thats not an option please try again.");
+            if (processSplitChoice(choice, hand, ++turn)) {
+                break;
             }
+        }
+    }
+
+    private static void promptSplitOptions(int turn) {
+        if (turn == 0) {
+            System.out.println("What would you like to do? Hit, Stand, Double Down");
+        } else {
+            System.out.println("What would you like to do? hit or stand?");
+        }
+    }
+
+    private static boolean processSplitChoice(String choice, Hand hand, int turn) {
+        switch (choice) {
+            case "stand":
+                System.out.println("You stood");
+                return true;
+            case "hit":
+                System.out.println("you hit");
+                Card card = deck.drawCard();
+                hand.addCard(card);
+                System.out.println("Card " + (turn + 1) + ": " + card);
+                System.out.println("Total: " + hand.getTotalValue());
+                return false;
+            case "double down":
+                System.out.println("you doubled down");
+                Card card2 = deck.drawCard();
+                hand.addCard(card2);
+                System.out.println("Card 3: " + card2);
+                System.out.println("Total: " + hand.getTotalValue());
+                return true;
+            default:
+                System.out.println("Thats not an option please try again.");
+                return false;
         }
     }
 
