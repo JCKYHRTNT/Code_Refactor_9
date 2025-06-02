@@ -21,4 +21,8 @@ public class Hand {
         }
         System.out.println(owner + " Total: " + getTotalValue());
     }
+    
+    public int compareTo(Hand other) {
+    	return Integer.compare(this.getTotalValue(), other.getTotalValue());
+    }
 }

@@ -202,13 +202,12 @@ public class Game {
 	}
 
 	public void win() {
-		int player = playerHand.getTotalValue();
-		int dealer = dealerHand.getTotalValue();
+		int comparison = playerHand.compareTo(dealerHand);
 
-		if (dealer > player) {
-			System.out.println("Dealer Wins");
-		} else if (player > dealer) {
+		if (comparison > 0) {
 			System.out.println("Player Wins");
+		} else if (comparison < 0) {
+			System.out.println("Dealer Wins");
 		} else {
 			System.out.println("It's a tie no one wins");
 		}
