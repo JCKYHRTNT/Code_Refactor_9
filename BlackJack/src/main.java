@@ -1,25 +1,14 @@
 import java.util.*;
 
+public class Main {
 
-public class main {
+	public static Deck deck = new Deck();
+	public static Scanner input = new Scanner(System.in);
+	public static Hand playerHand = new Hand();
+	public static Hand dealerHand = new Hand();
+	public static boolean running = true;
 
-	static Random rand = new Random();
-	static Scanner input = new Scanner(System.in);
-	static String playerCard1 = "";
-	static String playerCard2 = "";
-	static int playerCardVal1 = 0;
-	static int playerCardVal2 = 0;
-	static int playerCardVal = 0;
-	static String dealerCard1 = "";
-	static String dealerCard2 = "";
-	static int dealerCardVal1 = 0;
-	static int dealerCardVal2 = 0;
-	static int dealerCardVal = 0;
-	static boolean running = true;
-	
 	public static void main(String[] args) {
-		
-		
 		dealerStart();
 		dealerCheck();
 		System.out.println();
@@ -28,276 +17,222 @@ public class main {
 		playerTurn();
 		System.out.println();
 		System.out.println();
-		if(running == true) {
+		if (running == true) {
 			dealerTurn();
 			dealerCheck();
-			if(running == true) {
+			if (running == true) {
 				win();
 			}
 		}
-		
 	}
-	
+
 	public static void playerTurn() {
-		String[] cards = new String[]{"2","3","4","5","6","7","8","9","10","Jack","Queen","King","Ace"};
-		int[] cardValue = new int[] {2,3,4,5,6,7,8,9,10,10,10,10,11};
-		int total = 0;
-		
-		int picker1 = rand.nextInt(13);
-		int picker2 = rand.nextInt(13);
-		
-		String card1 = cards[picker1];
-		String card2 = cards[picker2];
-		
-		total = cardValue[picker1] + cardValue[picker2];
-		playerCardVal1 = cardValue[picker1];
-		playerCardVal2 = cardValue[picker2];
-		playerCardVal = total;
-		playerCard1 = card1;
-		playerCard2 = card2;
-		
-		System.out.println("Player Card 1: " + card1);
-		System.out.println("Player Card 2: " + card2);
-		System.out.println("Player Total: " + total);
+		Card card1 = Deck.draw();
+		Card card2 = Deck.draw();
+
+		playerHand.addCard(card1);
+		playerHand.addCard(card2);
+
+		System.out.println("Player Card 1: " + card1.face);
+		System.out.println("Player Card 2: " + card2.face);
+		System.out.println("Player Total: " + playerHand.getTotalValue());
+
 		playerCheck();
 		System.out.println();
 		String choice = " ";
 		int turn = 0;
-		
-		for(;running == true;) {
-			
-			if(turn >= 1) {
+
+		for (; running == true;) {
+			if (turn >= 1) {
 				System.out.println("Would you like to hit or stand?");
-				String user = input.nextLine();
-				choice = user;
-			}else if(card1.equals(card2) && turn < 1) {
+				choice = input.nextLine();
+			} else if (card1.face.equals(card2.face) && turn < 1) {
 				System.out.println("What would you like to do: Hit, Stand, Double Down, or Split?");
-				String user = input.nextLine();
-				choice = user;
-			}else if(turn == 0){
+				choice = input.nextLine();
+			} else if (turn == 0) {
 				System.out.println("What would you like to do: Hit, Stand, Double Down: ");
-				String user = input.nextLine();
-				choice = user;
+				choice = input.nextLine();
 			}
-			if(choice.equals("hit") || choice.equals("Hit")) {
+
+			if (choice.equalsIgnoreCase("hit")) {
 				System.out.println("you hit");
 				turn++;
 				hit();
 				playerCheck();
-			}else if(choice.equals("stand") || choice.equals("Stand")) {
+			} else if (choice.equalsIgnoreCase("stand")) {
 				System.out.println("you stood");
 				break;
-			}else if(choice.equals("double down") || choice.equals("Double Down")) {
+			} else if (choice.equalsIgnoreCase("double down")) {
 				System.out.println("you doubled down");
 				hit();
 				playerCheck();
 				break;
-			}else if(choice.equals("split") || choice.equals("Split")) {
+			} else if (choice.equalsIgnoreCase("split")) {
 				System.out.println("you split");
-				split();
+				split(card1, card2);
 				break;
-			}else {
+			} else {
 				System.out.println("Sorry that wasnt an option please try again");
 			}
 		}
 	}
-	
+
+	public static void dealerStart() {
+		Card card1 = Deck.draw();
+		Card card2 = Deck.draw();
+
+		dealerHand.addCard(card1);
+		dealerHand.addCard(card2);
+
+		System.out.println("Dealer Card 1: " + card1.face);
+		System.out.println("Dealer Card 2: " + card2.face);
+		System.out.println("Dealer Total: " + dealerHand.getTotalValue());
+	}
+
 	public static void dealerTurn() {
-		System.out.println("Dealer Card 1: " + dealerCard1);
-		System.out.println("Dealer Card 2: " + dealerCard2);
-		System.out.println("Dealer Total: " + dealerCardVal);
-		
-		if(dealerCardVal < 17) {
-			for(; dealerCardVal < 17;) {
-				System.out.println();
-				System.out.println("Dealer Hits");
-				String[] cards = new String[]{"2","3","4","5","6","7","8","9","10","Jack","Queen","King","Ace"};
-				int[] cardValue = new int[] {2,3,4,5,6,7,8,9,10,10,10,10,11};
-				
-				
-				int picker1 = rand.nextInt(13);
-				String card = cards[picker1];
-				
-				dealerCardVal += cardValue[picker1];
-				System.out.println("Dealer's New Card: " + card);
-				System.out.println("Total: " + dealerCardVal);
-			}
-		}else {
+		dealerHand.print("Dealer");
+
+		while (dealerHand.getTotalValue() < 17) {
+			System.out.println();
+			System.out.println("Dealer Hits");
+			Card newCard = Deck.draw();
+			dealerHand.addCard(newCard);
+			System.out.println("Dealer's New Card: " + newCard.face);
+			System.out.println("Total: " + dealerHand.getTotalValue());
+		}
+
+		if (dealerHand.getTotalValue() >= 17) {
 			System.out.println("Dealer Stands");
 		}
 	}
-	public static void dealerStart() {
-		
-		String[] cards = new String[]{"2","3","4","5","6","7","8","9","10","Jack","Queen","King","Ace"};
-		int[] cardValue = new int[] {2,3,4,5,6,7,8,9,10,10,10,10,11};
-		int total = 0;
-		
-		int picker1 = rand.nextInt(13);
-		int picker2 = rand.nextInt(13);
-		
-		String card1 = cards[picker1];
-		String card2 = cards[picker2];
-		total = cardValue[picker1] + cardValue[picker2];
-		dealerCard1 = card1;
-		dealerCard2 = card2;
-		dealerCardVal1 = cardValue[picker1];
-		dealerCardVal2 = cardValue[picker2];
-		dealerCardVal = dealerCardVal1 + dealerCardVal2;
-		
-		System.out.println("Dealer Card 1: " + card1);
-		System.out.println("Dealer Card 2: " + card2);
-		System.out.println("Dealer Total: " + total);
-	}
+
 	public static void hit() {
-		String[] cards = new String[]{"2","3","4","5","6","7","8","9","10","Jack","Queen","King","Ace"};
-		int[] cardValue = new int[] {2,3,4,5,6,7,8,9,10,10,10,10,11};
-		
-		
-		int picker1 = rand.nextInt(13);
-		String card = cards[picker1];
-		
-		playerCardVal += cardValue[picker1];
-		System.out.println("Player's New Card: " + card);
-		System.out.println("Total: " + playerCardVal);
-		
-	}public static void split() {
-		
-		String[] cards = new String[]{"2","3","4","5","6","7","8","9","10","Jack","Queen","King","Ace"};
-		int[] cardValue = new int[] {2,3,4,5,6,7,8,9,10,10,10,10,11};
-		int total = 0;
-		
-		int picker1 = rand.nextInt(13);
-		int picker2 = rand.nextInt(13);
-		
-		String card1 = cards[picker1];
-		String card2 = cards[picker2];
-		
-		int total1 = cardValue[picker1] + playerCardVal1; 
-		int total2 = cardValue[picker2] + playerCardVal2; 
-		
+		Card newCard = Deck.draw();
+		playerHand.addCard(newCard);
+		System.out.println("Player's New Card: " + newCard.face);
+		System.out.println("Total: " + playerHand.getTotalValue());
+	}
+
+	public static void split(Card original1, Card original2) {
+		Hand hand1 = new Hand();
+		Hand hand2 = new Hand();
+
+		hand1.addCard(original1);
+		hand1.addCard(Deck.draw());
+
+		hand2.addCard(original2);
+		hand2.addCard(Deck.draw());
+
 		System.out.println("Hand 1:");
-		System.out.println("Card 1: " + playerCard1);
-		System.out.println("Card 2: " + card1);
-		System.out.println("Total: " + total1);
+		System.out.println("Card 1: " + hand1.cards.get(0).face);
+		System.out.println("Card 2: " + hand1.cards.get(1).face);
+		System.out.println("Total: " + hand1.getTotalValue());
+
 		System.out.println("Hand 2:");
-		System.out.println("Card 1: " + playerCard2);
-		System.out.println("Card 2: " + card2);
-		System.out.println("Total: " + total2);
-		
+		System.out.println("Card 1: " + hand2.cards.get(0).face);
+		System.out.println("Card 2: " + hand2.cards.get(1).face);
+		System.out.println("Total: " + hand2.getTotalValue());
+
 		System.out.println();
 		String choice = "";
 		int turn = 0;
-		
-		for(boolean isLoop = true;isLoop == true;) {
-			if(turn == 0) {
+
+		for (boolean isLoop = true; isLoop == true;) {
+			if (turn == 0) {
 				System.out.println("What would you like to do for hand 1? Hit, Stand, Double Down");
-				String user = input.nextLine();
-				choice = user;
-			}else {
+				choice = input.nextLine();
+			} else {
 				System.out.println("What would you like to do? hit or stand?");
-				String user = input.nextLine();
-				choice = user;
+				choice = input.nextLine();
 			}
-			
-			if(choice.equals("stand") || choice.equals("Stand")) {
+
+			if (choice.equalsIgnoreCase("stand")) {
 				System.out.println("You stood");
 				isLoop = false;
-			}else if(choice.equals("hit") || choice.equals("Hit")) {
+			} else if (choice.equalsIgnoreCase("hit")) {
 				turn++;
 				System.out.println("you hit");
-				int picker3 = rand.nextInt(13);
-				String card = cards[picker3];
-				int cardVal = cardValue[picker3];
-				total1 += cardVal;
-				int printTurn = turn + 2;
-				System.out.println("Card "+ printTurn + ": " + card);
-				System.out.println("Total: " + total1); 
-				
-			}else if(choice.equals("double down") || choice.equals("Double Down")) {
+				Card newCard = Deck.draw();
+				hand1.addCard(newCard);
+				System.out.println("Card " + (turn + 2) + ": " + newCard.face);
+				System.out.println("Total: " + hand1.getTotalValue());
+			} else if (choice.equalsIgnoreCase("double down")) {
 				System.out.println("you doubled down");
-				int picker3 = rand.nextInt(13);
-				String card = cards[picker3];
-				int cardVal = cardValue[picker3];
-				total1 += cardVal;
-				System.out.println("Card 3: "+ card);
-				System.out.println("Total: " + total1); 
+				Card newCard = Deck.draw();
+				hand1.addCard(newCard);
+				System.out.println("Card 3: " + newCard.face);
+				System.out.println("Total: " + hand1.getTotalValue());
 				isLoop = false;
-			}else {
+			} else {
 				System.out.println("Thats not an option please try again.");
 			}
 		}
+
 		turn = 0;
-		for(boolean isLoop2 = true;isLoop2 == true;) {
-			if(turn == 0) {
+		for (boolean isLoop2 = true; isLoop2 == true;) {
+			if (turn == 0) {
 				System.out.println("What would you like to do for hand 2? Hit, Stand, Double Down");
-				String user = input.nextLine();
-				choice = user;
-			}else {
+				choice = input.nextLine();
+			} else {
 				System.out.println("What would you like to do? hit or stand?");
-				String user = input.nextLine();
-				choice = user;
+				choice = input.nextLine();
 			}
-			
-			if(choice.equals("stand") || choice.equals("Stand")) {
+
+			if (choice.equalsIgnoreCase("stand")) {
 				System.out.println("You stood");
 				isLoop2 = false;
-			}else if(choice.equals("hit") || choice.equals("Hit")) {
+			} else if (choice.equalsIgnoreCase("hit")) {
 				turn++;
 				System.out.println("you hit");
-				int picker3 = rand.nextInt(13);
-				String card = cards[picker3];
-				int cardVal = cardValue[picker3];
-				total2 += cardVal;
-				int printTurn = turn + 2;
-				System.out.println("Card "+ printTurn + ": " + card);
-				System.out.println("Total: " + total2); 
-				
-			}else if(choice.equals("double down") || choice.equals("Double Down")) {
+				Card newCard = Deck.draw();
+				hand2.addCard(newCard);
+				System.out.println("Card " + (turn + 2) + ": " + newCard.face);
+				System.out.println("Total: " + hand2.getTotalValue());
+			} else if (choice.equalsIgnoreCase("double down")) {
 				System.out.println("you doubled down");
-				int picker3 = rand.nextInt(13);
-				String card = cards[picker3];
-				int cardVal = cardValue[picker3];
-				total2 += cardVal;
-				System.out.println("Card 3: "+ card);
-				System.out.println("Total: " + total2); 
+				Card newCard = Deck.draw();
+				hand2.addCard(newCard);
+				System.out.println("Card 3: " + newCard.face);
+				System.out.println("Total: " + hand2.getTotalValue());
 				isLoop2 = false;
-			}else {
+			} else {
 				System.out.println("Thats not an option please try again.");
 			}
 		}
-			
-		
 	}
+
 	public static void playerCheck() {
-		
-		if(playerCardVal == 21) {
+		int total = playerHand.getTotalValue();
+		if (total == 21) {
 			System.out.println("BLACK JACK!!!! Player Wins");
 			running = false;
-		}else if(playerCardVal > 21) {
+		} else if (total > 21) {
 			System.out.println("Player Busted");
 			running = false;
 		}
-		
 	}
+
 	public static void dealerCheck() {
-		
-		if(dealerCardVal == 21) {
+		int total = dealerHand.getTotalValue();
+		if (total == 21) {
 			System.out.println("BLACK JACK!!!! Dealer Wins");
 			running = false;
-		}else if(dealerCardVal > 21) {
+		} else if (total > 21) {
 			System.out.println("Dealer Busted");
 			running = false;
 		}
 	}
+
 	public static void win() {
-		
-		if(dealerCardVal > playerCardVal) {
+		int player = playerHand.getTotalValue();
+		int dealer = dealerHand.getTotalValue();
+
+		if (dealer > player) {
 			System.out.println("Dealer Wins");
-		}else if(playerCardVal > dealerCardVal) {
+		} else if (player > dealer) {
 			System.out.println("Player Wins");
-		}else {
+		} else {
 			System.out.println("It's a tie no one wins");
 		}
-		
 	}
 }
