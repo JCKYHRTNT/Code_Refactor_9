@@ -27,8 +27,8 @@ public class Main {
 	}
 
 		public static void playerTurn() {
-		Card card1 = deck.draw();
-		Card card2 = deck.draw();
+		Card card1 = Deck.draw();
+		Card card2 = Deck.draw();
 		initialPlayerDraw(card1, card2);
 		String choice = " ";
 		int turn = 0;
@@ -184,23 +184,20 @@ public class Main {
 	}
 
 	public static void playerCheck() {
-		int total = playerHand.getTotalValue();
-		if (total == 21) {
-			System.out.println("BLACK JACK!!!! Player Wins");
-			running = false;
-		} else if (total > 21) {
-			System.out.println("Player Busted");
-			running = false;
-		}
+		checkBlackjackOrBust(playerHand, "Player");
 	}
 
 	public static void dealerCheck() {
-		int total = dealerHand.getTotalValue();
+		checkBlackjackOrBust(dealerHand, "Dealer");
+	}
+
+	public static void checkBlackjackOrBust(Hand hand, String owner) {
+		int total = hand.getTotalValue();
 		if (total == 21) {
-			System.out.println("BLACK JACK!!!! Dealer Wins");
+			System.out.println("BLACK JACK!!!! " + owner + " Wins");
 			running = false;
 		} else if (total > 21) {
-			System.out.println("Dealer Busted");
+			System.out.println(owner + " Busted");
 			running = false;
 		}
 	}
