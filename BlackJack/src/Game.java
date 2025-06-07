@@ -64,8 +64,10 @@ public class Game {
         while (running) {
             choice = getPlayerChoice(turn, card1, card2);
             Boolean result = handlePlayerChoice(choice, turn, card1, card2);
-            if (result == null) continue;
-            if (!result) break;
+            if (result == null)
+                continue;
+            if (!result)
+                break;
             turn++;
         }
     }
@@ -92,37 +94,31 @@ public class Game {
     }
 
     private Boolean handlePlayerChoice(String choice, int turn, Card card1, Card card2) {
+        PlayerAction action;
+
         if (choice.equalsIgnoreCase("hit")) {
-            System.out.println("you hit");
-            hit();
-            playerCheck();
-            return true;
+            action = new HitAction();
         } else if (choice.equalsIgnoreCase("stand")) {
-            System.out.println("you stood");
-            return false;
+            action = new StandAction();
         } else if (choice.equalsIgnoreCase("double down")) {
-            System.out.println("you doubled down");
-            hit();
-            playerCheck();
-            return false;
+            action = new DoubleDownAction();
         } else if (choice.equalsIgnoreCase("split")) {
-            System.out.println("you split");
-            split(card1, card2);
-            return false;
+            action = new SplitAction();
         } else {
-            System.out.println("Sorry that wasnt an option please try again");
-            return null;
+            action = new InvalidAction();
         }
+
+        return action.execute(this, turn, card1, card2);
     }
 
-    private void hit() {
+    public void hit() {
         Card newCard = Deck.draw();
         playerHand.addCard(newCard);
         System.out.println("Player's New Card: " + newCard.face);
         System.out.println("Total: " + playerHand.getTotalValue());
     }
 
-    private void split(Card original1, Card original2) {
+    public void split(Card original1, Card original2) {
         Hand hand1 = new Hand();
         Hand hand2 = new Hand();
 
@@ -182,7 +178,7 @@ public class Game {
         }
     }
 
-    private void playerCheck() {
+    public void playerCheck() {
         checkBlackjackOrBust(playerHand, "Player");
     }
 
