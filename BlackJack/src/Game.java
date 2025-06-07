@@ -64,8 +64,10 @@ public class Game {
         while (running) {
             choice = getPlayerChoice(turn, card1, card2);
             Boolean result = handlePlayerChoice(choice, turn, card1, card2);
-            if (result == null) continue;
-            if (!result) break;
+            if (result == null)
+                continue;
+            if (!result)
+                break;
             turn++;
         }
     }
@@ -93,36 +95,43 @@ public class Game {
 
     private Boolean handlePlayerChoice(String choice, int turn, Card card1, Card card2) {
         if (choice.equalsIgnoreCase("hit")) {
-            System.out.println("you hit");
-            hit();
-            playerCheck();
-            return true;
+            return hit();
         } else if (choice.equalsIgnoreCase("stand")) {
-            System.out.println("you stood");
-            return false;
+            return stand();
         } else if (choice.equalsIgnoreCase("double down")) {
-            System.out.println("you doubled down");
-            hit();
-            playerCheck();
-            return false;
+            return doubledown();
         } else if (choice.equalsIgnoreCase("split")) {
-            System.out.println("you split");
-            split(card1, card2);
-            return false;
+            return split(card1, card2);
         } else {
             System.out.println("Sorry that wasnt an option please try again");
             return null;
         }
     }
 
-    private void hit() {
+    private Boolean hit() {
+        System.out.println("you hit");
         Card newCard = Deck.draw();
         playerHand.addCard(newCard);
         System.out.println("Player's New Card: " + newCard.face);
         System.out.println("Total: " + playerHand.getTotalValue());
+        playerCheck();
+        return true;
     }
 
-    private void split(Card original1, Card original2) {
+    private Boolean stand() {
+        System.out.println("you stood");
+        return false;
+    }
+
+    private Boolean doubledown() {
+        System.out.println("you doubled down");
+        hit();
+        playerCheck();
+        return false;
+    }
+
+    private Boolean split(Card original1, Card original2) {
+        System.out.println("you split");
         Hand hand1 = new Hand();
         Hand hand2 = new Hand();
 
@@ -145,6 +154,7 @@ public class Game {
         System.out.println();
         playSplitHand(hand1, 1);
         playSplitHand(hand2, 2);
+        return false;
     }
 
     private void playSplitHand(Hand hand, int handNumber) {
